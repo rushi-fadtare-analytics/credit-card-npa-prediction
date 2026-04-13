@@ -205,3 +205,15 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# --- Custom ML Project Additions ---
+# Ignore Data
+data/raw/
+data/processed/
+*.csv
+*.xlsx
+*.parquet
+
+# Ignore saved models (these can also be large)
+models/*.joblib
+models/*.pkl
