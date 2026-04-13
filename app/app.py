@@ -2,26 +2,26 @@ import streamlit as st
 import pandas as pd
 import joblib
 
-# 1. Page Configuration (Enterprise Branding)
+# Application Layout & Brand Configuration
 st.set_page_config(page_title="Credit Risk AI", layout="centered")
 
-# 2. Load the Model
-# We use st.cache_resource so it doesn't reload the model every time you click a button
+# Model Serialization & Cached Inference
+# Optimizing memory overhead by caching the pipeline resource
 @st.cache_resource
 def load_model():
     return joblib.load('models/credit_risk_pipeline.joblib')
 
 model = load_model()
 
-# 3. Sidebar Information
+# Sidebar Metadata & Diagnostics Info
 st.sidebar.title("System Info")
-st.sidebar.info("This model predicts the probability of a 90-day delinquency (NPA) based on financial behavior.")
+st.sidebar.info("Predicts 90-day delinquency probability (NPA) using behavioral financial variables.")
 
-# 4. Main UI
+# Feature Engineering UI: Primary Interface
 st.title("🏦 Credit Risk NPA Prediction")
-st.markdown("Enter customer details below to assess default probability.")
+st.markdown("Enter customer financial parameters for automated risk assessment.")
 
-# Input fields organized in columns for a cleaner look
+# UI Layout: Input feature columns for structured data entry
 col1, col2 = st.columns(2)
 
 with col1:
@@ -36,13 +36,13 @@ with col2:
     late_90 = st.number_input("Times 90+ Days Late", min_value=0, value=0)
     real_estate = st.number_input("Real Estate Loans", min_value=0, value=0)
 
-# Optional fields
+# Secondary Risk Indicators
 late_60 = st.number_input("Times 60-89 Days Past Due", min_value=0, value=0)
 dependents = st.number_input("Number of Dependents", min_value=0, value=0)
 
-# 5. Prediction Logic
+# Inference Pipeline Execution
 if st.button("Assess Risk"):
-    # Prepare the input data into a DataFrame with exact column names from training
+    # Map raw inputs to established training feature schema
     input_data = pd.DataFrame([[
         revolving, age, past_due_30, debt_ratio, income, 
         open_lines, late_90, real_estate, late_60, dependents
@@ -53,13 +53,13 @@ if st.button("Assess Risk"):
         'NumberOfTime60-89DaysPastDueNotWorse', 'NumberOfDependents'
     ])
     
-    # Make Prediction
+    # Execute class probability inference
     prediction_proba = model.predict_proba(input_data)[0][1]
     
-    # Display Result
+    # Strategic Risk Classification Output
     st.subheader(f"Default Probability: {prediction_proba:.2%}")
     
     if prediction_proba > 0.5:
-        st.error("⚠️ HIGH RISK: High probability of delinquency.")
+        st.error("⚠️ HIGH RISK: Significant delinquency probability detected.")
     else:
-        st.success("✅ LOW RISK: Customer likely to remain current.")
+        st.success("✅ LOW RISK: Exposure within acceptable default thresholds.")
